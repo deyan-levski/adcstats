@@ -2,6 +2,7 @@ clc;
 clear all;
 close all;
 
+<<<<<<< HEAD
 pgmFile = 'snapshots/snapshot000.pgm';
 pgmFile1 = 'snapshots/snapshot001.pgm';
 pgmFile2 = 'snapshots/snapshot002.pgm';
@@ -16,6 +17,10 @@ pgmFile10 = 'snapshots/snapshot010.pgm';
 pgmFile11 = 'snapshots/snapshot011.pgm';
 
 analyzeColumn = 68;
+=======
+pgmFile = 'snapshots/snapshot001.pgm';
+analyzeColumn = 128;
+>>>>>>> 051510b84ba30321e49227886fc11acc6913ec14
 columnsTotal = 128; %1024
 artOffset = 0;
 
@@ -51,7 +56,11 @@ title('Code Density Histogram');
 column = imageIn(:,analyzeColumn);
 
 figure();
+<<<<<<< HEAD
 histogram(column+artOffset);
+=======
+hist(column+artOffset, 50);
+>>>>>>> 051510b84ba30321e49227886fc11acc6913ec14
 
 meanColumn = mean(column);
 stdColumn = std(column);
@@ -62,11 +71,14 @@ ylabel('N');
 title(['Noise spread for column: ' num2str(analyzeColumn)]);
 
 % 3D
-[count,bins] = hist(imageIn,10);
+[count,bins] = hist(imageIn, 50);
 
 figure();
 
-b = bar3c(bins, count, 'detached');
+b = bar3c(bins, count, 'detatched');
+xlabel('Column Nr (X)');
+ylabel('DN (Y)');
+zlabel('Occurrences N (Z)');
 
 binColumn = dec2bin(column)-'0';
 
