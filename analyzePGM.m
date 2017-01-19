@@ -2,9 +2,9 @@ clc;
 clear all;
 close all;
 
-pgmFile = 'snapshot000.pgm';
-analyzeColumn = 1024;
-columnsTotal = 1024; %1024
+pgmFile = 'snapshots/snapshot001.pgm';
+analyzeColumn = 128;
+columnsTotal = 128; %1024
 artOffset = 0;
 
 imageIn = double(imread(pgmFile)/16); % div by 16 to scale 16bit to 12bit
@@ -17,7 +17,7 @@ imageIn = imageIn(:,1:columnsTotal);
 column = imageIn(:,analyzeColumn);
 % 2D
 figure();
-hist(column+artOffset);
+hist(column+artOffset, 50);
 
 meanColumn = mean(column);
 stdColumn = std(column);
@@ -28,11 +28,14 @@ ylabel('N');
 title(['Noise spread for column: ' num2str(analyzeColumn)]);
 
 % 3D
-[count,bins] = hist(imageIn,10);
+[count,bins] = hist(imageIn, 50);
 
 figure();
 
-b = bar3c(bins, count, 'detached');
+b = bar3c(bins, count, 'detatched');
+xlabel('Column Nr (X)');
+ylabel('DN (Y)');
+zlabel('Occurrences N (Z)');
 
 binColumn = dec2bin(column)-'0';
 
