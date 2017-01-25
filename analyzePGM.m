@@ -12,7 +12,7 @@ doDNLLinearRamp = 0;
 
 
 pgmFile = 'snapshots/DNL/snapshot000.pgm';
-analyzeColumn = 63;
+analyzeColumn = 63; %%%
 columnsTotal = 127; %1024
 
 %   imageIn = [];
