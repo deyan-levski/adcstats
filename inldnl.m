@@ -10,15 +10,15 @@ if isempty(filename)
    filename = 'listing';
 end
 fid=fopen(filename,'r');
-numpt=input('Enter Number of Data Points:  ');
-numbit=input ('Enter ADC Resolution:  ');
+numpt=32000; %input('Enter Number of Data Points:  ');
+numbit=12; %input ('Enter ADC Resolution:  ');
 mid_code=input('Enter Mid-Code (Mean Code):  ');
 
 for i=1:13,	
    fgetl(fid);
 end
 [v1,count]=fscanf(fid,'%f',[2,numpt]);
-fclose(fid);
+fclose(fid)
 
 v1=v1';
 code=v1(:,2);
