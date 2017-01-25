@@ -2,9 +2,9 @@ clc;
 clear all;
 close all;
 
-pgmFile = 'snapshots/snapshot001.pgm';
-analyzeColumn = 128;
-columnsTotal = 128; %1024
+pgmFile = 'snapshots/snapshot000.pgm';
+analyzeColumn = 63;
+columnsTotal = 1024; %1024
 artOffset = 0;
 
 imageIn = double(imread(pgmFile)/16); % div by 16 to scale 16bit to 12bit
@@ -28,7 +28,7 @@ ylabel('N');
 title(['Noise spread for column: ' num2str(analyzeColumn)]);
 
 % 3D
-[count,bins] = hist(imageIn, 50);
+[count,bins] = hist(imageIn, 25);
 
 figure();
 
@@ -49,7 +49,7 @@ for k = 1:columnsTotal
   
   end
 figure();  
-  plot(meanColumn);
+  plot((meanColumn/2)+1048);
   xlabel('Column ADC Nr (X)');
   xlim([0 columnsTotal]);
   ylabel(['Mean value of column over ' num2str(length(column)) ' samples']);
