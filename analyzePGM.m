@@ -2,31 +2,86 @@ clc;
 clear all;
 close all;
 
+<<<<<<< HEAD
 pgmFile = 'snapshots/snapshot000.pgm';
 analyzeColumn = 63;
 columnsTotal = 1024; %1024
 artOffset = 0;
+=======
+doTotalArrayHist = 0;
+do3DTotalArrayHist = 0;
+doMeanOfCols = 0;
+doColumnHist = 0;
+doColumnProfile = 1;
+doDNLLinearRamp = 0;
+>>>>>>> 75afdc521c6b202e818f9c7b5f8e5739c55af492
 
+
+
+pgmFile = 'snapshots/DNL/snapshot000.pgm';
+analyzeColumn = 63;
+columnsTotal = 127; %1024
+
+%   imageIn = [];
+%   
+%    pgmFile = 'snapshots/DNL/F/snapshot';
+%    for a = 0:99
+%       filename = [pgmFile num2str(a,'%03d') '.pgm'];
+%       img = imread(filename);
+%       % do something with img
+%       imageIn = [imageIn; double(imread(filename)/16)]; % div by 16 to scale 16bit to 12bit
+%    end
+ 
 imageIn = double(imread(pgmFile)/16); % div by 16 to scale 16bit to 12bit
-
 imageIn = imageIn(:,1:columnsTotal);
+%% Histograms
 
-
-% Histograms
-
-column = imageIn(:,analyzeColumn);
-% 2D
+% Total array histogram
+if doTotalArrayHist == 1
 figure();
-hist(column+artOffset, 50);
+bins = max(max(imageIn)) - min(min(imageIn));
+histogram(imageIn, bins);
+xlabel('Code [LSB]');
+ylabel('Density [N]');
+title('Code Density Histogram');
+end;
+
+
+% 2D Histogram
+column = imageIn(:,analyzeColumn);
+bins = max(column) - min(column);
+
+if doColumnHist == 1
+    
+figure();
+histogram(column, bins);
 
 meanColumn = mean(column);
 stdColumn = std(column);
 varColumn = var(column);
 
-xlabel(['Mean: ' num2str(meanColumn+artOffset) '; Stdev: ' num2str(stdColumn) '; Var: ' num2str(varColumn) ]);
+xlabel(['Mean: ' num2str(meanColumn) '; Stdev: ' num2str(stdColumn) '; Var: ' num2str(varColumn) ]);
 ylabel('N');
 title(['Noise spread for column: ' num2str(analyzeColumn)]);
 
+end;
+
+    
+if doColumnProfile == 1
+% 2D Column Profile
+figure();
+L = stairs(column);
+grid on;
+%L = get(gca,'YTickLabel');
+%set(gca,'YTickLabel',cellfun(@(x) dec2bin(str2num(x),12),L,'UniformOutput',false));
+xlabel('Sample');
+ylabel('Code');
+title(['Column profile for column: ' num2str(analyzeColumn)]);
+
+end;
+
+if do3DTotalArrayHist == 1
+    
 % 3D
 [count,bins] = hist(imageIn, 25);
 
@@ -39,18 +94,71 @@ zlabel('Occurrences N (Z)');
 
 binColumn = dec2bin(column)-'0';
 
+end;
+
 % Analyze column FPN
 
+if doMeanOfCols == 1 
 for k = 1:columnsTotal
   
   column = imageIn(:,k);
   
-  meanColumn(k) = mean(column+artOffset);
+  meanColumn(k) = mean(column);
   
+<<<<<<< HEAD
   end
 figure();  
   plot((meanColumn/2)+1048);
+=======
+end
+  figure();  
+  plot(meanColumn);
+>>>>>>> 75afdc521c6b202e818f9c7b5f8e5739c55af492
   xlabel('Column ADC Nr (X)');
   xlim([0 columnsTotal]);
   ylabel(['Mean value of column over ' num2str(length(column)) ' samples']);
   title(['Mean columns (X) for ' num2str(length(column)) ' samples']);
+end
+  
+  % Analyze DNL Linear Ramp Method
+  
+  if doDNLLinearRamp == 1
+      
+  column = imageIn(:,analyzeColumn);
+  colSamples = length(column);
+  hitsTheory = colSamples/(2^12 - 2);
+  figure();
+  
+  H = histogram(column,(max(column)-min(column)));
+  
+  DNL = (H.Values/hitsTheory) - 1;
+  close();
+   
+  figure();
+  plot(DNL);
+  xlabel('Code /w offset');
+  ylabel('DNL [LSB]');
+  title(['Differential Nonlinearity for column: ' num2str(analyzeColumn)]);
+  
+  figure();
+  imageIn = imageIn(:,1:columnsTotal);
+  [x y] = size(imageIn);
+  colSamples = x*y;
+  hitsTheory = colSamples/(2^12 - 2);
+
+  bins = max(max(imageIn)) - min(min(imageIn));
+  D = histogram(imageIn, bins);
+ 
+  DNL = D.Values/hitsTheory - 1;
+  close();
+   
+  figure();
+  plot(DNL);
+  xlabel('Code /w offset');
+  ylabel('DNL [LSB]');
+  title(['Differential Nonlinearity for array set of: ' num2str(columnsTotal) ' columns or ' num2str(colSamples) ' samples']);
+  
+  end
+  
+  
+  
