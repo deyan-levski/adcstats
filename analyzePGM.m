@@ -2,8 +2,8 @@ clc;
 clear all;
 close all;
 
-doTotalArrayHist = 0;
-do3DTotalArrayHist = 0;
+doTotalArrayHist = 1;
+do3DTotalArrayHist = 1;
 doMeanOfCols = 0;
 doColumnHist = 0;
 doColumnProfile = 1;
@@ -33,7 +33,7 @@ imageIn = imageIn(:,1:columnsTotal);
 if doTotalArrayHist == 1
 figure();
 bins = max(max(imageIn)) - min(min(imageIn));
-histogram(imageIn, bins);
+histogram(imageIn, round(bins/4));
 xlabel('Code [LSB]');
 ylabel('Density [N]');
 title('Code Density Histogram');
