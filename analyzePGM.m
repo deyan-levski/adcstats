@@ -2,18 +2,24 @@ clc;
 clear all;
 close all;
 
+useUSBStream = 0;
+
+analyzeColumn = 39;
+columnsTotal = 1024; %1024
+
 doTotalArrayHist = 0;
 do3DTotalArrayHist = 0;
-doMeanOfCols = 0;
-doColumnHist = 0;
+doMeanOfCols = 1;
+doColumnHist = 1;
 doColumnProfile = 1;
 doDNLLinearRamp = 0;
+doDNLINLHist = 0;
 
 
+if useUSBStream == 0
 
-pgmFile = 'snapshots/DNL/snapshot000.pgm';
-analyzeColumn = 63;
-columnsTotal = 127; %1024
+pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
+
 
 %   imageIn = [];
 %   
@@ -27,6 +33,14 @@ columnsTotal = 127; %1024
  
 imageIn = double(imread(pgmFile)/16); % div by 16 to scale 16bit to 12bit
 imageIn = imageIn(:,1:columnsTotal);
+
+else
+    
+    data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
+    imageIn = data(:,2);
+    
+end
+    
 %% Histograms
 
 % Total array histogram
@@ -41,14 +55,19 @@ end;
 
 
 % 2D Histogram
+if useUSBStream == 0
 column = imageIn(:,analyzeColumn);
 bins = max(column) - min(column);
+else
+column = imageIn;
+bins = max(column) - min(column);
+end
 
 if doColumnHist == 1
     
 figure();
 histogram(column, bins);
-
+histfit(column,bins,'normal');
 meanColumn = mean(column);
 stdColumn = std(column);
 varColumn = var(column);
@@ -153,4 +172,69 @@ end
   end
   
   
+  if doDNLINLHist == 1
   
+[dnl,inl] = dnl_inl_sin(imageIn);
+
+  figure();
+  plot(dnl);
+  grid on;
+  xlabel('Code /w offset');
+  ylabel('DNL [LSB]');
+  
+  figure();
+  plot(inl);
+  grid on;
+  xlabel('Code /w offset');
+  ylabel('INL [LSB]');
+  
+  
+  for y=1:length(dnl)
+      
+     if dnl(y) > 0.4
+     dnl(y) = dnl(y)*0.65;
+     else
+     dnl(y) = dnl(y);
+     end
+           
+  end
+  
+  figure();
+  plot(dnl);
+  grid on;
+  xlabel('Code /w offset and compensation');
+  ylabel('DNL [LSB]');
+  
+  end
+  
+  
+function [dnl,inl] = dnl_inl_sin(y)
+%DNL_INL_SIN
+% dnl and inl ADC output
+% input y contains the ADC output
+% vector obtained from quantizing a
+% sinusoid
+% Boris Murmann, Aug 2002
+% Bernhard Boser, Sept 2002
+% histogram boundaries
+minbin=min(y);
+maxbin=max(y);
+% histogram
+h = hist(y, minbin:maxbin);
+% cumulative histogram
+ch = cumsum(h);
+% transition levels
+T = -cos(pi*ch/sum(h));
+% linearized histogram
+hlin = T(2:end) - T(1:end-1);
+% truncate at least first and last
+% bin, more if input did not clip ADC
+trunc=2;
+hlin_trunc = hlin(1+trunc:end-trunc);
+% calculate lsb size and dnl
+lsb= sum(hlin_trunc) / (length(hlin_trunc));
+dnl= [0 hlin_trunc/lsb-1];
+misscodes = length(find(dnl<-0.9));
+% calculate inl
+inl= cumsum(dnl);
+end
