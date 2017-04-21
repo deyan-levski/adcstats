@@ -9,6 +9,13 @@ columnsTotal = 1024; %1024
 
 doTotalArrayHist = 0;
 do3DTotalArrayHist = 0;
+
+doMeanOfCols = 0;
+doColumnHist = 0;
+doColumnProfile = 0;
+doDNLLinearRamp = 0;
+doCalcCFPN = 1;
+
 doMeanOfCols = 1;
 doColumnHist = 1;
 doColumnProfile = 1;
@@ -16,13 +23,18 @@ doDNLLinearRamp = 0;
 doDNLINLHist = 0;
 
 
+
 if useUSBStream == 0
 
 pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
 
 
-%   imageIn = [];
-%   
+pgmFile = 'snapshots/DNL/snapshot000.pgm';
+analyzeColumn = 57;
+columnsTotal = 1024; %1024
+
+   imageIn = [];
+   
 %    pgmFile = 'snapshots/DNL/F/snapshot';
 %    for a = 0:99
 %       filename = [pgmFile num2str(a,'%03d') '.pgm'];
@@ -31,7 +43,7 @@ pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
 %       imageIn = [imageIn; double(imread(filename)/16)]; % div by 16 to scale 16bit to 12bit
 %    end
  
-imageIn = double(imread(pgmFile)/16); % div by 16 to scale 16bit to 12bit
+imageIn = double(fix(imread(pgmFile)/16)); % div by 16 to scale 16bit to 12bit
 imageIn = imageIn(:,1:columnsTotal);
 
 else
@@ -47,12 +59,29 @@ end
 if doTotalArrayHist == 1
 figure();
 bins = max(max(imageIn)) - min(min(imageIn));
-histogram(imageIn, round(bins/4));
+histogram(imageIn, bins);
 xlabel('Code [LSB]');
 ylabel('Density [N]');
 title('Code Density Histogram');
 end;
 
+if doCalcCFPN == 1
+    
+    for u = 1:columnsTotal
+        meanCol(u) = mean(imageIn(:,u));
+    end
+    
+    maxMeanCol = max(meanCol);
+    minMeanCol = min(meanCol);
+    
+    CFPN = (((maxMeanCol - minMeanCol)/4096)*100)/3.5;
+    
+    figure();    
+    plot(meanCol);
+    xlabel('Column Nr');
+    ylabel('Mean Magnitude (avgd)');
+    title(['Column Fixed Pattern Noise: ' num2str(CFPN) ' %']);
+end;
 
 % 2D Histogram
 if useUSBStream == 0
@@ -100,7 +129,7 @@ end;
 if do3DTotalArrayHist == 1
     
 % 3D
-[count,bins] = hist(imageIn, 25);
+[count,bins] = hist(imageIn, bins);
 
 figure();
 
