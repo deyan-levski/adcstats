@@ -15,6 +15,7 @@ doColumnHist = 0;
 doColumnProfile = 0;
 doDNLLinearRamp = 0;
 doCalcCFPN = 1;
+doCalcCompNoise = 1;
 
 doMeanOfCols = 1;
 doColumnHist = 1;
@@ -26,11 +27,12 @@ doDNLINLHist = 0;
 
 if useUSBStream == 0
 
-pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
+%pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
 
 
-pgmFile = 'snapshots/DNL/snapshot000.pgm';
-analyzeColumn = 57;
+%pgmFile = 'snapshots/DNL/snapshot000.pgm';
+pgmFile = 'measure/snapshot000.pgm';
+analyzeColumn = 68;
 columnsTotal = 1024; %1024
 
    imageIn = [];
@@ -65,6 +67,7 @@ ylabel('Density [N]');
 title('Code Density Histogram');
 end;
 
+% Calculate CFPN in %
 if doCalcCFPN == 1
     
     for u = 1:columnsTotal
@@ -81,6 +84,25 @@ if doCalcCFPN == 1
     xlabel('Column Nr');
     ylabel('Mean Magnitude (avgd)');
     title(['Column Fixed Pattern Noise: ' num2str(CFPN) ' %']);
+end;
+
+% Calculate comparator noise
+
+if doCalcCompNoise == 1
+    
+    compNoise = (imageIn(:,analyzeColumn) - mean(imageIn(:,analyzeColumn))) - (imageIn(:,analyzeColumn+1) - mean(imageIn(:,analyzeColumn+1))); % subtract adjacent columns, 60/61 in this case
+    figure();
+    bins = max(compNoise) - min(compNoise);
+    histogram(compNoise, bins);
+    histfit(compNoise, bins, 'normal');
+    meanColumn = mean(compNoise);
+    stdColumn = std(compNoise);
+    varColumn = var(compNoise);
+
+    xlabel(['Mean: ' num2str(meanColumn) '; Stdev: ' num2str(stdColumn) '; Var: ' num2str(varColumn) ]);
+    ylabel('N');
+    title(['Comparator Output Noise, cols(' num2str(analyzeColumn) '/' num2str(analyzeColumn+1) ')']);
+    
 end;
 
 % 2D Histogram
