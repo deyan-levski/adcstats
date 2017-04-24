@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-useUSBStream = 0;
+useUSBStream = 1;
 
 analyzeColumn = 39;
 columnsTotal = 1024; %1024
@@ -14,14 +14,14 @@ doMeanOfCols = 0;
 doColumnHist = 0;
 doColumnProfile = 0;
 doDNLLinearRamp = 0;
-doCalcCFPN = 1;
-doCalcCompNoise = 1;
+doCalcCFPN = 0;
+doCalcCompNoise = 0;
 
-doMeanOfCols = 1;
-doColumnHist = 1;
-doColumnProfile = 1;
+doMeanOfCols = 0;
+doColumnHist = 0;
+doColumnProfile = 0;
 doDNLLinearRamp = 0;
-doDNLINLHist = 0;
+doDNLINLHist = 1;
 
 
 
@@ -50,7 +50,9 @@ imageIn = imageIn(:,1:columnsTotal);
 
 else
     
-    data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
+    %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
+    data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
+
     imageIn = data(:,2);
     
 end
