@@ -51,7 +51,8 @@ imageIn = imageIn(:,1:columnsTotal);
 else
     
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
-    data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
+    %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
+    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin1.csv',',',1,0);
 
     imageIn = data(:,2);
     
@@ -234,6 +235,7 @@ end
   grid on;
   xlabel('Code /w offset');
   ylabel('DNL [LSB]');
+  %ylim([-4 4]);
   
   figure();
   plot(inl);
