@@ -52,7 +52,7 @@ else
     
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
-    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin1.csv',',',1,0);
+    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
 
     imageIn = data(:,2);
     
@@ -235,14 +235,15 @@ end
   grid on;
   xlabel('Code /w offset');
   ylabel('DNL [LSB]');
-  %ylim([-4 4]);
+  ylim([-2 3]);
+  xlim([0 4096]);
   
   figure();
   plot(inl);
   grid on;
   xlabel('Code /w offset');
   ylabel('INL [LSB]');
-  
+  xlim([0 4096]);
   
   for y=1:length(dnl)
       
@@ -259,6 +260,8 @@ end
   grid on;
   xlabel('Code /w offset and compensation');
   ylabel('DNL [LSB]');
+  ylim([-2 2]);
+  xlim([0 4096]);
   
   end
   
