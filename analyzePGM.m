@@ -5,10 +5,10 @@ close all;
 useUSBStream = 0;
 
 analyzeColumn = 39;
-columnsTotal = 1024; %1024
+columnsTotal = 128; %1024
 
 doTotalArrayHist = 0;
-do3DTotalArrayHist = 0;
+do3DTotalArrayHist = 1;
 
 doMeanOfCols = 0;
 doColumnHist = 0;
@@ -30,10 +30,10 @@ if useUSBStream == 0
 %pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
 
 
-%pgmFile = 'snapshots/DNL/snapshot000.pgm';
 pgmFile = 'measure/snapshot000.pgm';
+%pgmFile = 'measure/snapshot000.pgm';
 analyzeColumn = 68;
-columnsTotal = 1024; %1024
+columnsTotal = 128; %1024
 
    imageIn = [];
    
@@ -149,6 +149,8 @@ title(['Column profile for column: ' num2str(analyzeColumn)]);
 end;
 
 if do3DTotalArrayHist == 1
+    
+    bins = 50;
     
 % 3D
 [count,bins] = hist(imageIn, bins);
