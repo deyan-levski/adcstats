@@ -4,29 +4,29 @@ close all;
 
 useUSBStream = 1;
 
-analyzeColumn = 72;
+analyzeColumn = 10;
 columnsTotal = 128; %1024
 
 doTotalArrayHist = 0;
 do3DTotalArrayHist = 0;
 
 doMeanOfCols = 0;
-doColumnHist = 0;
-doColumnProfile = 0;
+doColumnHist = 1;
+doColumnProfile = 1;
 doDNLLinearRamp = 0;
 doCalcCFPN = 0;
 doCalcCompNoise = 0;
-doDNLINLHist = 0;
-doDNLINLHist3d = 1;
+doDNLINLHist = 1;
+doDNLINLHist3d = 0;
 
 
 if useUSBStream == 0
 
 %pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
 
-pgmFile = 'measure/snapshot000.pgm';
+%pgmFile = 'measure/snapshot001.pgm';
 %pgmFile = 'measure/snapshot000.pgm';
-analyzeColumn = 68;
+analyzeColumn = 10;
 columnsTotal = 128; %1024
 
    imageIn = [];
@@ -39,18 +39,19 @@ columnsTotal = 128; %1024
 %       imageIn = [imageIn; double(imread(filename)/16)]; % div by 16 to scale 16bit to 12bit
 %    end
  
-imageIn = double(fix(imread(pgmFile)/16)); % div by 16 to scale 16bit to 12bit
-imageIn = imageIn(:,1:columnsTotal);
+%imageIn = double(fix(imread(pgmFile)/16)); % div by 16 to scale 16bit to 12bit
+%imageIn = imageIn(:,1:columnsTotal);
 
 else
     
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
-    %data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
-    data = dlmread('/media/storage/simdrive/streams/250M/cat.csv',',',1,0);
+    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
+    %data = dlmread('/media/storage/simdrive/streams/250M/cat.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/cat-256.csv',',',1,0);
-    %imageIn = data(:,2);
-    imageIn = data;    
+    
+    imageIn = data(:,2);
+    %imageIn = data;    
     
 end
     
