@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-useUSBStream = 1;
+useUSBStream = 0;
 
 analyzeColumn = 10;
 columnsTotal = 128; %1024
@@ -12,21 +12,21 @@ do3DTotalArrayHist = 0;
 
 doMeanOfCols = 0;
 doColumnHist = 1;
-doColumnProfile = 1;
+doColumnProfile = 0;
 doDNLLinearRamp = 0;
 doCalcCFPN = 0;
-doCalcCompNoise = 0;
-doDNLINLHist = 1;
+doCalcCompNoise = 1;
+doDNLINLHist = 0;
 doDNLINLHist3d = 0;
 
 
 if useUSBStream == 0
 
 %pgmFile = 'snapshots/DNL/snapshot000-w-dcds-2x-gain.pgm';
-
+pgmFile = '/media/storage/simdrive/streams/noise/snapshot000-no-dcds.pgm';
 %pgmFile = 'measure/snapshot001.pgm';
 %pgmFile = 'measure/snapshot000.pgm';
-analyzeColumn = 10;
+analyzeColumn = 45;
 columnsTotal = 128; %1024
 
    imageIn = [];
@@ -39,14 +39,14 @@ columnsTotal = 128; %1024
 %       imageIn = [imageIn; double(imread(filename)/16)]; % div by 16 to scale 16bit to 12bit
 %    end
  
-%imageIn = double(fix(imread(pgmFile)/16)); % div by 16 to scale 16bit to 12bit
-%imageIn = imageIn(:,1:columnsTotal);
+imageIn = double(fix(imread(pgmFile)/16)); % div by 16 to scale 16bit to 12bit
+imageIn = imageIn(:,1:columnsTotal);
 
 else
     
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
-    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
+    %data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/cat.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/cat-256.csv',',',1,0);
     
@@ -90,7 +90,12 @@ end;
 
 if doCalcCompNoise == 1
     
-    compNoise = (imageIn(:,analyzeColumn) - mean(imageIn(:,analyzeColumn))) - (imageIn(:,analyzeColumn+1) - mean(imageIn(:,analyzeColumn+1))); % subtract adjacent columns, 60/61 in this case
+    compNoise = (imageIn(:,analyzeColumn) - mean(imageIn(:,analyzeColumn))) - (imageIn(:,analyzeColumn+1) - mean(imageIn(:,analyzeColumn+1)))/2; % subtract adjacent columns, 60/61 in this case
+    %indices = find(abs(compNoise)>3.5);
+    %compNoise(indices) = [];
+    %indices = find(abs(compNoise)<-3.5);
+    %compNoise(indices) = [];
+    
     figure();
     bins = max(compNoise) - min(compNoise);
     histogram(compNoise, bins);
