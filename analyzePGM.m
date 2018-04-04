@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-useUSBStream = 0;
+useUSBStream = 1;
 
 analyzeColumn = 10;
 columnsTotal = 128; %1024
@@ -15,8 +15,8 @@ doColumnHist = 1;
 doColumnProfile = 0;
 doDNLLinearRamp = 0;
 doCalcCFPN = 0;
-doCalcCompNoise = 1;
-doDNLINLHist = 0;
+doCalcCompNoise = 0;
+doDNLINLHist = 1;
 doDNLINLHist3d = 0;
 
 
@@ -26,7 +26,7 @@ if useUSBStream == 0
 pgmFile = '/media/storage/simdrive/streams/noise/snapshot000-no-dcds.pgm';
 %pgmFile = 'measure/snapshot001.pgm';
 %pgmFile = 'measure/snapshot000.pgm';
-analyzeColumn = 45;
+analyzeColumn = 44;
 columnsTotal = 128; %1024
 
    imageIn = [];
@@ -46,7 +46,7 @@ else
     
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
-    %data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
+    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/cat.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/cat-256.csv',',',1,0);
     
@@ -107,6 +107,14 @@ if doCalcCompNoise == 1
     xlabel(['Mean: ' num2str(meanColumn) '; Stdev: ' num2str(stdColumn) '; Var: ' num2str(varColumn) ]);
     ylabel('N');
     title(['Comparator Output Noise, cols(' num2str(analyzeColumn) '/' num2str(analyzeColumn+1) ')']);
+    
+    % Full group for paper in uV
+    %
+    %kb = 1:128;
+    %bar(kb,(stdImgIn-0.5)*0.000317)
+    
+    
+    
     
 end;
 
@@ -235,12 +243,13 @@ end
 [dnl,inl] = dnl_inl_sin(imageIn);
 
   figure();
-  plot(dnl);
+  %plot(dnl);
+  stem(dnl,'Marker', 'none');
   grid on;
   xlabel('Code /w offset');
   ylabel('DNL [LSB]');
-  ylim([-2 3]);
-  xlim([0 4096]);
+  %ylim([-2 3]);
+  %xlim([0 4096]);
   
   figure();
   plot(inl);
@@ -260,7 +269,8 @@ end
   end
   
   figure();
-  plot(dnl);
+  %plot(dnl);
+  stem(dnl,'Marker', 'none');
   grid on;
   xlabel('Code /w offset and compensation');
   ylabel('DNL [LSB]');
