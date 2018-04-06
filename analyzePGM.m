@@ -5,19 +5,19 @@ close all;
 useUSBStream = 1;
 
 analyzeColumn = 10;
-columnsTotal = 128; %1024
+columnsTotal = 128;
 
 doTotalArrayHist = 0;
 do3DTotalArrayHist = 0;
 
 doMeanOfCols = 0;
-doColumnHist = 1;
+doColumnHist = 0;
 doColumnProfile = 0;
 doDNLLinearRamp = 0;
 doCalcCFPN = 0;
 doCalcCompNoise = 0;
-doDNLINLHist = 1;
-doDNLINLHist3d = 0;
+doDNLINLHist = 0;
+doDNLINLHist3d = 1;
 
 
 if useUSBStream == 0
@@ -27,9 +27,9 @@ pgmFile = '/media/storage/simdrive/streams/noise/snapshot000-no-dcds.pgm';
 %pgmFile = 'measure/snapshot001.pgm';
 %pgmFile = 'measure/snapshot000.pgm';
 analyzeColumn = 44;
-columnsTotal = 128; %1024
+columnsTotal = 128;
 
-   imageIn = [];
+imageIn = [];
    
 %    pgmFile = 'snapshots/DNL/F/snapshot';
 %    for a = 0:99
@@ -46,12 +46,12 @@ else
     
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_50-HIST-227Hz-CAT.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/stream250M_58-HIST-71Hz-CAT.csv',',',1,0);
-    data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
-    %data = dlmread('/media/storage/simdrive/streams/250M/cat.csv',',',1,0);
+    %data = dlmread('/media/storage/simdrive/streams/250M/nonlinear/nonlin4.csv',',',1,0);
+    data = dlmread('/media/storage/simdrive/streams/250M/cat.csv',',',1,0);
     %data = dlmread('/media/storage/simdrive/streams/250M/cat-256.csv',',',1,0);
     
-    imageIn = data(:,2);
-    %imageIn = data;    
+    %imageIn = data(:,2);
+    imageIn = data;    
     
 end
     
@@ -238,6 +238,39 @@ end
   end
   
   
+  function [dnl,inl] = dnl_inl_sin(y)
+%DNL_INL_SIN
+% dnl and inl ADC output
+% input y contains the ADC output
+% vector obtained from quantizing a
+% sinusoid
+% Boris Murmann, Aug 2002
+% Bernhard Boser, Sept 2002
+% histogram boundaries
+minbin=min(y);
+maxbin=max(y);
+% histogram
+h = hist(y, minbin:maxbin);
+% cumulative histogram
+ch = cumsum(h);
+% transition levels
+T = -cos(pi*ch/sum(h));
+% linearized histogram
+hlin = T(2:end) - T(1:end-1);
+% truncate at least first and last
+% bin, more if input did not clip ADC
+trunc=2;
+hlin_trunc = hlin(1+trunc:end-trunc);
+% calculate lsb size and dnl
+lsb= sum(hlin_trunc) / (length(hlin_trunc));
+dnl= [0 hlin_trunc/lsb-1];
+misscodes = length(find(dnl<-0.9));
+% calculate inl
+inl= cumsum(dnl);
+end
+  
+  
+  
   if doDNLINLHist == 1
   
 [dnl,inl] = dnl_inl_sin(imageIn);
@@ -328,41 +361,9 @@ end
   end
 
 
-    
 
   
-  
-  
-function [dnl,inl] = dnl_inl_sin(y)
-%DNL_INL_SIN
-% dnl and inl ADC output
-% input y contains the ADC output
-% vector obtained from quantizing a
-% sinusoid
-% Boris Murmann, Aug 2002
-% Bernhard Boser, Sept 2002
-% histogram boundaries
-minbin=min(y);
-maxbin=max(y);
-% histogram
-h = hist(y, minbin:maxbin);
-% cumulative histogram
-ch = cumsum(h);
-% transition levels
-T = -cos(pi*ch/sum(h));
-% linearized histogram
-hlin = T(2:end) - T(1:end-1);
-% truncate at least first and last
-% bin, more if input did not clip ADC
-trunc=2;
-hlin_trunc = hlin(1+trunc:end-trunc);
-% calculate lsb size and dnl
-lsb= sum(hlin_trunc) / (length(hlin_trunc));
-dnl= [0 hlin_trunc/lsb-1];
-misscodes = length(find(dnl<-0.9));
-% calculate inl
-inl= cumsum(dnl);
-end
+
 
 
 %% Capture 3D rotating DNL surface plot video
